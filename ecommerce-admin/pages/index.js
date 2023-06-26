@@ -1,6 +1,5 @@
 import Layout from "@/components/Layout";
-import Nav from "@/components/Nav";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 
 export default function Home() {
   const { data: session } = useSession();
@@ -17,7 +16,7 @@ export default function Home() {
             alt=""
             className="w-6 h-6 rounded-lg overflow-hidden"
           />
-          <span className="px-2">{session.user?.name}</span>
+          <span className="px-2">{session?.user?.name}</span>
         </div>
       </div>
     </Layout>
