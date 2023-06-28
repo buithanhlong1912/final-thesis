@@ -16,8 +16,6 @@ export default function Layout({ children }) {
     <div className="bg-blue-900 min-h-screen flex">
       <Nav />
       <div className="bg-white flex-grow mt-2 mr-2 mg-2 rounded-lg p-4">
-        {/* Signed in as {session.user.email} <br />
-        <button onClick={() => signOut()}>Sign out</button> */}
         {children}
       </div>
     </div>
