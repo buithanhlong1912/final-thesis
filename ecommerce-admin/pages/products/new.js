@@ -11,6 +11,7 @@ export default function NewProduct() {
                     description: '',
                     price: 0,
                     images: [],
+                    category: '',
                 }}
             />
         </Layout>

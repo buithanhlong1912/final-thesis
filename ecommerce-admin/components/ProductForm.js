@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Spinner from './Spinner';
 import { ReactSortable } from 'react-sortablejs';
 
@@ -13,6 +13,7 @@ export default function ProductForm({ productInfo }) {
     const [productImages, setProductImages] = useState(
         productInfo.images
     );
+    const [categories, setCategories] = useState([]);
     const { _id } = productInfo;
     const router = useRouter();
     const onChangeProduct = (label, data) => {
@@ -65,6 +66,12 @@ export default function ProductForm({ productInfo }) {
         setProduct({ ...product, images });
     };
 
+    useEffect(() => {
+        axios.get('/api/categories').then((res) => {
+            setCategories(res.data);
+        });
+    }, []);
+
     return (
         <form onSubmit={saveProduct}>
             <label>Product Name</label>
@@ -99,6 +106,27 @@ export default function ProductForm({ productInfo }) {
                     )
                 }
             />
+            <label>Category</label>
+            <select
+                value={product.category}
+                onChange={(ev) =>
+                    onChangeProduct(
+                        'category',
+                        ev.target.value
+                    )
+                }
+            >
+                <option value="0">No category</option>
+                {categories.length > 0 &&
+                    categories.map((category) => (
+                        <option
+                            value={category._id}
+                            key={category._id}
+                        >
+                            {category.name}
+                        </option>
+                    ))}
+            </select>
             <label>Photos</label>
             <div className="mb-2 flex flex-col flex-wrap gap-2">
                 <label

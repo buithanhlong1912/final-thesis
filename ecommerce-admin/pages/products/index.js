@@ -1,5 +1,6 @@
 import Layout from '@/components/Layout';
 import DeleteProductModal from '@/components/Modal/DeleteProductModal';
+import { getCategoryName } from '@/utils/utils';
 import axios from 'axios';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -10,6 +11,7 @@ export default function Products() {
         useState(false);
     const [deleteProductId, setDeleteProductId] =
         useState('');
+
     useEffect(() => {
         axios.get('/api/products').then((response) => {
             setProducts(response.data);
@@ -29,14 +31,38 @@ export default function Products() {
             <table className="basic mt-2 ">
                 <thead>
                     <tr>
-                        <td>Product Name</td>
-                        <td></td>
+                        <td>Sản phẩm</td>
+                        <td>Giá</td>
+                        <td>Ảnh minh họa</td>
+                        <td>Loại sản phẩm</td>
+                        <td>Chỉnh sửa/ Xóa sản phẩm</td>
                     </tr>
                 </thead>
                 <tbody>
                     {products.map((product) => (
                         <tr key={product._id}>
                             <td>{product.name}</td>
+                            <td>{product.price}</td>
+                            <td>
+                                <div>
+                                    {
+                                        product?.category
+                                            ?.name
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                <div className="h-24">
+                                    <img
+                                        src={
+                                            product
+                                                .images[0]
+                                        }
+                                        alt=""
+                                        className="rounded-lg"
+                                    />
+                                </div>
+                            </td>
                             <td>
                                 <Link
                                     href={`/products/edit/${product._id}`}
@@ -59,6 +85,7 @@ export default function Products() {
                                 </Link>
 
                                 <button
+                                    className="bg-red-600"
                                     onClick={() => {
                                         setShowDeleteForm(
                                             true

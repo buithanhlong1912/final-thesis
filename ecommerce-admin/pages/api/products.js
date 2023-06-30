@@ -3,7 +3,6 @@ import { Product } from '@/models/Product';
 
 export default async function handle(req, res) {
     const { method } = req;
-    // console.log(method);
     await mongooseConnect();
 
     if (method === 'GET') {
@@ -14,29 +13,42 @@ export default async function handle(req, res) {
                 })
             );
         } else {
-            res.json(await Product.find());
+            res.json(
+                await Product.find().populate('category')
+            );
         }
     }
 
     if (method === 'POST') {
-        const { name, description, price, images } =
-            req.body;
-        console.log(images);
+        const {
+            name,
+            description,
+            price,
+            images,
+            category,
+        } = req.body;
         const productDoc = await Product.create({
             name,
             description,
             price,
             images,
+            category,
         });
         res.json(productDoc);
     }
 
     if (method === 'PUT') {
-        const { name, description, price, images, _id } =
-            req.body;
+        const {
+            name,
+            description,
+            price,
+            images,
+            category,
+            _id,
+        } = req.body;
         await Product.updateOne(
             { _id },
-            { name, description, price, images }
+            { name, description, price, images, category }
         );
         res.json(true);
     }
