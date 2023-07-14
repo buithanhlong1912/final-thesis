@@ -9,11 +9,11 @@ import Heading from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
 import { DataTable } from '@/components/ui/data-table';
 
-interface BillboardClientProps {
+interface OrderClientProps {
     data: OrderColumn[];
 }
 
-const BillboardClient: React.FC<BillboardClientProps> = ({
+const OrderClient: React.FC<OrderClientProps> = ({
     data,
 }) => {
     const router = useRouter();
@@ -47,4 +47,4 @@ const BillboardClient: React.FC<BillboardClientProps> = ({
     );
 };
 
-export default BillboardClient;
+export default OrderClient;
