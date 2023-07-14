@@ -3,14 +3,14 @@
 import { Plus } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 
-import { BillboardColumn, columns } from './column';
+import { OrderColumn, columns } from './column';
 import { Button } from '@/components/ui/button';
 import Heading from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
 import { DataTable } from '@/components/ui/data-table';
 
 interface BillboardClientProps {
-    data: BillboardColumn[];
+    data: OrderColumn[];
 }
 
 const BillboardClient: React.FC<BillboardClientProps> = ({
@@ -23,13 +23,13 @@ const BillboardClient: React.FC<BillboardClientProps> = ({
         <>
             <div className="flex items-center justify-between">
                 <Heading
-                    title={`Ảnh bìa (${data.length})`}
-                    description="Quản lý ảnh bìa cho cửa hàng"
+                    title={`Đơn hàng (${data.length})`}
+                    description="Quản lý đơn hàng hiện tại của cửa hàng"
                 />
                 <Button
                     onClick={() =>
                         router.push(
-                            `/${params.storeId}/billboards/new`
+                            `/${params.storeId}/orders/new`
                         )
                     }
                 >

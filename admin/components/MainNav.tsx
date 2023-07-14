@@ -25,6 +25,37 @@ const MainNav = ({
                 `/${params.storeId}/billboards`,
         },
         {
+            href: `/${params.storeId}/categories`,
+            label: 'Danh mục',
+            active:
+                pathname ===
+                `/${params.storeId}/categories`,
+        },
+        {
+            href: `/${params.storeId}/colors`,
+            label: 'Màu sắc',
+            active:
+                pathname === `/${params.storeId}/colors`,
+        },
+        {
+            href: `/${params.storeId}/brands`,
+            label: 'Nhãn hàng',
+            active:
+                pathname === `/${params.storeId}/brands`,
+        },
+        {
+            href: `/${params.storeId}/products`,
+            label: 'Sản phẩm',
+            active:
+                pathname === `/${params.storeId}/products`,
+        },
+        {
+            href: `/${params.storeId}/orders`,
+            label: 'Đơn hàng',
+            active:
+                pathname === `/${params.storeId}/orders`,
+        },
+        {
             href: `/${params.storeId}/settings`,
             label: 'Cài đặt',
             active:

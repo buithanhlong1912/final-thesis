@@ -3,17 +3,17 @@
 import { Plus } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 
-import { BillboardColumn, columns } from './column';
+import { ColorColumn, columns } from './column';
 import { Button } from '@/components/ui/button';
 import Heading from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
 import { DataTable } from '@/components/ui/data-table';
 
-interface BillboardClientProps {
-    data: BillboardColumn[];
+interface ColorClientProps {
+    data: ColorColumn[];
 }
 
-const BillboardClient: React.FC<BillboardClientProps> = ({
+const ColorClient: React.FC<ColorClientProps> = ({
     data,
 }) => {
     const router = useRouter();
@@ -23,13 +23,13 @@ const BillboardClient: React.FC<BillboardClientProps> = ({
         <>
             <div className="flex items-center justify-between">
                 <Heading
-                    title={`Ảnh bìa (${data.length})`}
-                    description="Quản lý ảnh bìa cho cửa hàng"
+                    title={`Màu sắc (${data.length})`}
+                    description="Quản lý danh sách màu sắc sản phẩm cho cửa hàng"
                 />
                 <Button
                     onClick={() =>
                         router.push(
-                            `/${params.storeId}/billboards/new`
+                            `/${params.storeId}/colors/new`
                         )
                     }
                 >
@@ -41,10 +41,10 @@ const BillboardClient: React.FC<BillboardClientProps> = ({
             <DataTable
                 columns={columns}
                 data={data}
-                searchKey="label"
+                searchKey="name"
             />
         </>
     );
 };
 
-export default BillboardClient;
+export default ColorClient;

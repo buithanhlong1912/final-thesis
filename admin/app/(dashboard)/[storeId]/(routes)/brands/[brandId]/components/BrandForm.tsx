@@ -1,6 +1,6 @@
 'use client';
 
-import { Billboard } from '@prisma/client';
+import { Brand } from '@prisma/client';
 import { Trash } from 'lucide-react';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -23,20 +23,18 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import AlertModal from '@/components/modals/alert-modals';
-import ImageUpload from '@/components/ui/image-upload';
 
 const formSchema = z.object({
-    label: z.string().min(1),
-    imageUrl: z.string().min(1),
+    name: z.string().min(1),
 });
 
-type BillboardFormValue = z.infer<typeof formSchema>;
+type BrandFormValue = z.infer<typeof formSchema>;
 
-interface BillboardFormProps {
-    initialData: Billboard | null;
+interface BrandFormProps {
+    initialData: Brand | null;
 }
 
-const BillboardForm: React.FC<BillboardFormProps> = ({
+const BrandForm: React.FC<BrandFormProps> = ({
     initialData,
 }) => {
     const params = useParams();
@@ -46,42 +44,41 @@ const BillboardForm: React.FC<BillboardFormProps> = ({
     const [loading, setLoading] = useState(false);
 
     const title = initialData
-        ? 'Chỉnh sửa trang bìa'
-        : 'Thêm mới trang bìa';
+        ? 'Chỉnh sửa nhãn hàng'
+        : 'Thêm mới nhãn hàng';
     const description = initialData
-        ? 'Chỉnh sửa thông tin trang bìa'
-        : 'Thêm mới thông tin trang bìa';
+        ? 'Chỉnh sửa thông tin nhãn hàng'
+        : 'Thêm mới thông tin nhãn hàng';
     const toastMessage = initialData
-        ? 'Chỉnh sửa trang bìa thành công!'
-        : 'Thêm mới trang bìa thành công!';
+        ? 'Chỉnh sửa nhãn hàng thành công!'
+        : 'Thêm mới nhãn hàng thành công!';
     const action = initialData
-        ? 'Lưu thông tin trang bìa'
+        ? 'Lưu thông tin nhãn hàng'
         : 'Thêm mới';
 
-    const form = useForm<BillboardFormValue>({
+    const form = useForm<BrandFormValue>({
         resolver: zodResolver(formSchema),
         defaultValues: initialData || {
-            label: '',
-            imageUrl: '',
+            name: '',
         },
     });
 
-    const onSubmit = async (data: BillboardFormValue) => {
+    const onSubmit = async (data: BrandFormValue) => {
         try {
             setLoading(true);
             if (initialData) {
                 await axios.patch(
-                    `/api/${params.storeId}/billboards/${params.billboardId}`,
+                    `/api/${params.storeId}/brands/${params.brandId}`,
                     data
                 );
             } else {
                 await axios.post(
-                    `/api/${params.storeId}/billboards`,
+                    `/api/${params.storeId}/brands`,
                     data
                 );
             }
             router.refresh();
-            router.push(`/${params.storeId}/billboards`);
+            router.push(`/${params.storeId}/brands`);
             toast.success(toastMessage);
         } catch (err) {
             toast.error('Lỗi khi xử lý!');
@@ -94,14 +91,16 @@ const BillboardForm: React.FC<BillboardFormProps> = ({
         try {
             setLoading(true);
             await axios.delete(
-                `/api/${params.storeId}/billboards/${params.billboardId}`
+                `/api/${params.storeId}/brands/${params.brandId}`
             );
-            toast.success('Đã xóa thành công trang bìa!');
+            toast.success(
+                'Đã xóa thành công danh mục sản phẩm!'
+            );
             router.refresh();
-            router.push(`/${params.storeId}/billboards`);
+            router.push(`/${params.storeId}/brands`);
         } catch (err) {
             toast.error(
-                'Hãy chắc chắn rằng đã hóa tất cả thông tin liên quan đến trang bìa này.'
+                'Hãy chắc chắn rằng đã hóa tất cả thông tin liên quan đến danh mục này.'
             );
         } finally {
             setLoading(false);
@@ -118,7 +117,7 @@ const BillboardForm: React.FC<BillboardFormProps> = ({
                 }}
                 onConfirm={onDelete}
                 loading={loading}
-                title="Bạn có muốn xóa ảnh bìa?"
+                title="Bạn có muốn xóa nhãn hàng?"
             />
             <div className="flex items-center justify-between">
                 <Heading
@@ -142,55 +141,21 @@ const BillboardForm: React.FC<BillboardFormProps> = ({
                     onSubmit={form.handleSubmit(onSubmit)}
                     className="space-y-8 w-full"
                 >
-                    <FormField
-                        control={form.control}
-                        name="imageUrl"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>
-                                    Ảnh nền
-                                </FormLabel>
-                                <FormControl>
-                                    <ImageUpload
-                                        value={
-                                            field.value
-                                                ? [
-                                                      field.value,
-                                                  ]
-                                                : []
-                                        }
-                                        disabled={loading}
-                                        onChange={(url) =>
-                                            field.onChange(
-                                                url
-                                            )
-                                        }
-                                        onRemove={() =>
-                                            field.onChange(
-                                                ''
-                                            )
-                                        }
-                                    />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
                     <div className="grid grid-cols-3 gap-8">
                         <FormField
                             control={form.control}
-                            name="label"
+                            name="name"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>
-                                        Label
+                                        Tên Nhãn Hàng
                                     </FormLabel>
                                     <FormControl>
                                         <Input
                                             disabled={
                                                 loading
                                             }
-                                            placeholder="Thông tin hiện lên trên ảnh trang bìa"
+                                            placeholder="Tên nhãn hàng mới trong cửa hàng"
                                             {...field}
                                         />
                                     </FormControl>
@@ -212,4 +177,4 @@ const BillboardForm: React.FC<BillboardFormProps> = ({
     );
 };
 
-export default BillboardForm;
+export default BrandForm;

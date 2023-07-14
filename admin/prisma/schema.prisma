@@ -12,12 +12,20 @@ datasource db {
 }
 
 model Store {
-  id         String      @id @default(uuid())
-  name       String
-  userId     String
-  billboards Billboard[] @relation("StoreToBillboard")
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  id            String        @id @default(uuid())
+  name          String
+  userId        String
+  billboards    Billboard[]   @relation("StoreToBillboard")
+  categories    Category[]    @relation("StoreToCategory")
+  products      Product[]     @relation("StoreToProduct")
+  brands        Brand[]       @relation("StoreToBrand")
+  colors        Color[]       @relation("StoreToColor")
+  orders        Order[]       @relation("StoreToOrder")
+  users         User[]        @relation("StoreToUser")
+  orderStatuses OrderStatus[] @relation("StoreToOrderStatus")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  Role          Role[]        @relation("StoreToRole")
 }
 
 model Billboard {
@@ -28,6 +36,147 @@ model Billboard {
   imageUrl  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([storeId])
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  storeId   String // Foreign Key to Store
+  store     Store     @relation("StoreToCategory", fields: [storeId], references: [id])
+  name      String
+  products  Product[] @relation("CategoryToProduct")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([storeId])
+}
+
+model Product {
+  id         String      @id @default(uuid())
+  storeId    String // Foreign Key to Store
+  store      Store       @relation("StoreToProduct", fields: [storeId], references: [id])
+  categoryId String // Foreign Key to Category
+  category   Category    @relation("CategoryToProduct", fields: [categoryId], references: [id])
+  name       String
+  price      Decimal
+  isFeatured Boolean     @default(false)
+  isArchived Boolean     @default(false)
+  brandId    String // Foreign Key to Size
+  brand      Brand       @relation("BrandToProduct", fields: [brandId], references: [id])
+  colorId    String // Foreign Key to Color
+  color      Color       @relation("ColorToProduct", fields: [colorId], references: [id])
+  images     Image[] // Relation to Image model
+  orderItems OrderItem[] // Relation to Order model
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@index([storeId])
+  @@index([categoryId])
+  @@index([brandId])
+  @@index([colorId])
+}
+
+model Brand {
+  id        String    @id @default(uuid())
+  storeId   String // Foreign Key to Store
+  store     Store     @relation("StoreToBrand", fields: [storeId], references: [id])
+  name      String
+  products  Product[] @relation("BrandToProduct")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([storeId])
+}
+
+model Color {
+  id        String    @id @default(uuid())
+  storeId   String // Foreign Key to Store
+  store     Store     @relation("StoreToColor", fields: [storeId], references: [id])
+  name      String
+  value     String
+  products  Product[] @relation("ColorToProduct")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([storeId])
+}
+
+model Image {
+  id        String   @id @default(uuid())
+  productId String // Foreign Key to Product
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String // URL of the image
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+}
+
+model Order {
+  id            String      @id @default(uuid())
+  storeId       String // Foreign Key to Store
+  store         Store       @relation("StoreToOrder", fields: [storeId], references: [id])
+  orderItems    OrderItem[] // Relation to OrderItem model
+  orderStatusId String
+  orderStatus   OrderStatus @relation("OrderToOrderStatus", fields: [orderStatusId], references: [id])
+  phone         String      @default("")
+  address       String      @default("")
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([storeId])
+  @@index([orderStatusId])
+}
+
+// Intermediary for a many-to-many relationship
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String // Foreign Key to Order
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String // Foreign Key to Product
+  product   Product @relation(fields: [productId], references: [id])
+  entity    Int
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  address   String
+  email     String
+  birth     DateTime
+  roles     Role[]
+  storeId   String
+  store     Store    @relation("StoreToUser", fields: [storeId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([storeId])
+}
+
+model Role {
+  id        String   @id @default(uuid())
+  role      String
+  User      User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  storeId   String
+  store     Store    @relation("StoreToRole", fields: [storeId], references: [id])
+
+  @@index([storeId])
+}
+
+model OrderStatus {
+  id        String   @id @default(uuid())
+  name      String
+  storeId   String
+  store     Store    @relation("StoreToOrderStatus", fields: [storeId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  order     Order[]  @relation("OrderToOrderStatus")
 
   @@index([storeId])
 }

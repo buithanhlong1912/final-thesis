@@ -9,6 +9,7 @@ interface AlertModalProps {
     onClose: () => void;
     onConfirm: () => void;
     loading: boolean;
+    title: string;
 }
 
 const AlertModal: React.FC<AlertModalProps> = ({
@@ -16,6 +17,7 @@ const AlertModal: React.FC<AlertModalProps> = ({
     onClose,
     onConfirm,
     loading,
+    title,
 }) => {
     const [isMounted, setIsMounted] = useState(false);
 
@@ -29,7 +31,10 @@ const AlertModal: React.FC<AlertModalProps> = ({
 
     return (
         <Modal
-            title="Bạn có chắc chắn muốn xóa cửa hàng?"
+            title={
+                title ||
+                'Bạn có chắc chắn muốn xóa cửa hàng?'
+            }
             description="Hành động này không thể hoàn tác."
             isOpen={isOpen}
             onClose={onClose}
