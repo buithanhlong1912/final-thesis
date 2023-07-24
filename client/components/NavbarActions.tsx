@@ -1,12 +1,35 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import Button from "./ui/Button";
 import { ShoppingBag } from "lucide-react";
+import { useRouter } from "next/navigation";
+import useCart from "@/hooks/useCart";
 
 const NavbarActions = () => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const router = useRouter();
+  const cart = useCart();
+
+  if (!mounted) {
+    return null;
+  }
+
   return (
     <div className="ml-auto flex items-center gap-x-4">
-      <Button className="ml-auto items-center rounded-full bg-black px-4 py-2">
+      <Button
+        onClick={() => router.push("/cart")}
+        className="flex items-center rounded-full bg-black px-4 py-2"
+      >
         <ShoppingBag size={20} color="white" />
+        <span className="ml-2 text-sm font-medium text-white">
+          {cart.items.length}
+        </span>
       </Button>
     </div>
   );

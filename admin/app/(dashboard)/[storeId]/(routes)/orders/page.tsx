@@ -6,55 +6,53 @@ import { vi } from 'date-fns/locale';
 import { formatter } from '@/lib/utils';
 
 const OrdersPage = async ({
-    params,
+  params,
 }: {
-    params: { storeId: string };
+  params: { storeId: string };
 }) => {
-    const orders = await prismadb.order.findMany({
-        where: { storeId: params.storeId },
+  const orders = await prismadb.order.findMany({
+    where: { storeId: params.storeId },
+    include: {
+      orderItems: {
         include: {
-            orderItems: {
-                include: {
-                    product: true,
-                },
-            },
-            orderStatus: true,
+          product: true,
         },
-        orderBy: { updatedAt: 'desc' },
-    });
+      },
+    },
+    orderBy: { updatedAt: 'desc' },
+  });
 
-    const formattedOrders: OrderColumn[] = orders.map(
-        (item) => ({
-            id: item.id,
-            phone: item.phone,
-            address: item.address,
-            products: item.orderItems
-                .map((orderItem) => orderItem.product.name)
-                .join(', '),
-            totalPrice: formatter.format(
-                item.orderItems.reduce((total, item) => {
-                    return (
-                        total +
-                        Number(item.product.price) *
-                            item.entity
-                    );
-                }, 0)
-            ),
-            updatedAt: format(
-                item.updatedAt,
-                'do MMMM, yyyy',
-                { locale: vi }
-            ),
-        })
-    );
+  const formattedOrders: OrderColumn[] = orders.map(
+    (item) => ({
+      id: item.id,
+      customerName: item.customerName,
+      phone: item.phone,
+      address: item.address,
+      isPaid: item.isPaid,
+      products: item.orderItems
+        .map((orderItem) => orderItem.product.name)
+        .join(', '),
+      totalPrice: formatter.format(
+        item.orderItems.reduce((total, item) => {
+          return (
+            total +
+            Number(item.product.price) * item.quantity
+          );
+        }, 0)
+      ),
+      updatedAt: format(item.updatedAt, 'do MMMM, yyyy', {
+        locale: vi,
+      }),
+    })
+  );
 
-    return (
-        <div className="flex-col">
-            <div className="flex-1 space-y-4 p-8 pt-6">
-                <OrderClient data={formattedOrders} />
-            </div>
-        </div>
-    );
+  return (
+    <div className="flex-col">
+      <div className="flex-1 space-y-4 p-8 pt-6">
+        <OrderClient data={formattedOrders} />
+      </div>
+    </div>
+  );
 };
 
 export default OrdersPage;

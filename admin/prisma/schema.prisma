@@ -114,29 +114,33 @@ model Image {
 }
 
 model Order {
-  id            String      @id @default(uuid())
-  storeId       String // Foreign Key to Store
-  store         Store       @relation("StoreToOrder", fields: [storeId], references: [id])
-  orderItems    OrderItem[] // Relation to OrderItem model
-  orderStatusId String
-  orderStatus   OrderStatus @relation("OrderToOrderStatus", fields: [orderStatusId], references: [id])
-  phone         String      @default("")
-  address       String      @default("")
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  id           String      @id @default(uuid())
+  storeId      String // Foreign Key to Store
+  store        Store       @relation("StoreToOrder", fields: [storeId], references: [id])
+  orderItems   OrderItem[]
+  // orderStatusId String
+  // orderStatus OrderStatus @relation("OrderToOrderStatus", fields: [orderStatusId], references: [id])
+  isPaid       Boolean     @default(false)
+  customerName String
+  phone        String      @default("")
+  address      String      @default("")
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  // @@index([orderStatusId])
 
   @@index([storeId])
-  @@index([orderStatusId])
 }
 
 // Intermediary for a many-to-many relationship
 model OrderItem {
-  id        String  @id @default(uuid())
+  id        String   @id @default(uuid())
   orderId   String // Foreign Key to Order
-  order     Order   @relation(fields: [orderId], references: [id])
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   productId String // Foreign Key to Product
-  product   Product @relation(fields: [productId], references: [id])
-  entity    Int
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([orderId])
   @@index([productId])
@@ -176,7 +180,11 @@ model OrderStatus {
   store     Store    @relation("StoreToOrderStatus", fields: [storeId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  order     Order[]  @relation("OrderToOrderStatus")
+  // order     Order[]  @relation("OrderToOrderStatus")
 
   @@index([storeId])
 }
+
+// generate db: npx prisma generate
+// push db: npx prisma db push
+// push db: npx prisma db reset
