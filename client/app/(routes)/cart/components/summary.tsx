@@ -20,7 +20,7 @@ const Summary = () => {
           <Currency value={totalPrice} />
         </div>
       </div>
-      <CheckoutForm />
+      {items.length > 0 && <CheckoutForm />}
     </div>
   );
 };

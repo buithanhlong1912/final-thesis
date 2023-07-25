@@ -109,7 +109,7 @@ const OrderForm: React.FC<ProductFormProps> = ({
 
   useEffect(() => {
     if (initialData) setOrderItems(initialData.orderItems);
-  }, []);
+  }, [initialData]);
 
   const onSubmit = async (data: ProductFormValue) => {
     try {
