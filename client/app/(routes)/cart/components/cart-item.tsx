@@ -5,16 +5,25 @@ import { Product } from "@/type";
 import useCart from "@/hooks/useCart";
 import IconButton from "@/components/ui/IconButton";
 import Currency from "@/components/ui/Currency";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 interface CartItemProps {
   data: Product;
+  quantity: number;
 }
 
-const CartItem: React.FC<CartItemProps> = ({ data }) => {
+const CartItem: React.FC<CartItemProps> = ({ data, quantity }) => {
   const cart = useCart();
 
   const onRemove = () => {
     cart.removeItem(data.id);
+  };
+
+  const onChangeProductQuantity = (event: any) => {
+    event.preventDefault();
+
+    cart.changeItemQuantity(data, event.target.value);
   };
 
   return (
@@ -43,6 +52,25 @@ const CartItem: React.FC<CartItemProps> = ({ data }) => {
             </p>
           </div>
           <Currency value={data.price} />
+        </div>
+        <div className="mt-4 text-sm grid grid-cols-2 gap-2 mr-5">
+          {/* <p className="text-gray-500">Số lượng :</p> */}
+          {/* <p className="text-gray-500 pl-2">
+            
+            </p> */}
+          <Label
+            htmlFor="quantity"
+            className="flex items-center justify-center ml-32"
+          >
+            Số lượng
+          </Label>
+          <Input
+            id="quantity"
+            type="number"
+            value={quantity}
+            onChange={onChangeProductQuantity}
+            className=""
+          />
         </div>
       </div>
     </li>

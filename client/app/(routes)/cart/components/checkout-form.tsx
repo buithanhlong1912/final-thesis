@@ -5,7 +5,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import AlertModal from "@/components/alert-modal/alert-modals";
+import { toast } from "react-hot-toast";
+import axios from "axios";
+
 import {
   Form,
   FormControl,
@@ -16,10 +18,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Button from "@/components/ui/Button";
-import axios from "axios";
 import useCart from "@/hooks/useCart";
+import { Textarea } from "@/components/ui/textarea";
 
 const formSchema = z.object({
+  customerName: z.string().min(10),
   phone: z
     .string()
     .min(10)
@@ -33,48 +36,71 @@ type formSchemaValue = z.infer<typeof formSchema>;
 
 const CheckoutForm = () => {
   const items = useCart((state) => state.items);
+  const router = useRouter();
+  const removeAll = useCart((state) => state.removeAll);
 
-  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const form = useForm<formSchemaValue>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      customerName: "",
       phone: "",
       address: "",
     },
   });
 
-  const onDelete = () => {};
+  const onSubmit = async (value: formSchemaValue) => {
+    try {
+      setLoading(true);
 
-  const onSubmit = async () => {
-    const response = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/checkout`,
-      {
-        productIds: items.map((item) => item.id),
-      }
-    );
+      const data = {
+        ...value,
+        isPaid: false,
+        orderItems: items.map((item) => ({
+          productId: item.data.id,
+          quantity: item.quantity,
+        })),
+      };
 
-    window.location = response.data.url;
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/orders`, data);
+
+      router.push("/");
+      removeAll();
+      toast.success("Đặt hàng thành công!");
+    } catch (err) {
+      console.log(err);
+      toast.error("Đặt hàng thất bại!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <>
-      <AlertModal
-        isOpen={open}
-        onClose={() => {
-          setOpen(false);
-        }}
-        onConfirm={onDelete}
-        loading={loading}
-        title="Bạn có muốn xóa ảnh bìa?"
-      />
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8 w-full"
         >
-          <div className="mt-3 gap-8">
+          <div className="mt-3 grid gap-2">
+            <FormField
+              control={form.control}
+              name="customerName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Người nhận hàng</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={loading}
+                      placeholder="Họ tên người nhận hàng"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="phone"
@@ -100,7 +126,8 @@ const CheckoutForm = () => {
                   <FormLabel>Địa chỉ nhận hàng</FormLabel>
                   <FormControl>
                     <div className="flex items-center gap-x-4">
-                      <Input
+                      <Textarea
+                        className="bg-white"
                         disabled={loading}
                         placeholder="Địa chỉ giao hàng"
                         {...field}

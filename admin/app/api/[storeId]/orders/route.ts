@@ -2,12 +2,23 @@ import prismadb from '@/lib/prismadb';
 import { auth } from '@clerk/nextjs';
 import { NextResponse } from 'next/server';
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods':
+    'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers':
+    'Content-Type, Authorization',
+};
+
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders });
+}
+
 export async function POST(
   req: Request,
   { params }: { params: { storeId: string } }
 ) {
   try {
-    const { userId } = auth();
     const body = await req.json();
 
     const {
@@ -17,12 +28,6 @@ export async function POST(
       isPaid,
       orderItems,
     } = body;
-
-    if (!userId) {
-      return new NextResponse('Unauthenticated', {
-        status: 401,
-      });
-    }
 
     if (!customerName) {
       return new NextResponse('customerName is required', {
@@ -42,12 +47,6 @@ export async function POST(
       });
     }
 
-    if (!isPaid) {
-      return new NextResponse('isPaid is required', {
-        status: 400,
-      });
-    }
-
     if (!orderItems) {
       return new NextResponse('orderItems is required', {
         status: 400,
@@ -63,7 +62,6 @@ export async function POST(
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: params.storeId,
-        userId,
       },
     });
 
@@ -101,7 +99,9 @@ export async function POST(
       },
     });
 
-    return NextResponse.json(order);
+    return NextResponse.json(order, {
+      headers: corsHeaders,
+    });
   } catch (err) {
     console.log('CATEGORY_POST', err);
     return new NextResponse('Internal error', {

@@ -6,16 +6,20 @@ import Currency from "@/components/ui/Currency";
 import Button from "@/components/ui/Button";
 import { Product } from "@/type";
 import useCart from "@/hooks/useCart";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { useState } from "react";
 
 interface InfoProps {
   data: Product;
 }
 
 const Info: React.FC<InfoProps> = ({ data }) => {
+  const [quantity, setQuantity] = useState(0);
   const cart = useCart();
 
   const onAddToCart = () => {
-    cart.addItem(data);
+    cart.addItem(data, quantity);
   };
 
   return (
@@ -39,6 +43,17 @@ const Info: React.FC<InfoProps> = ({ data }) => {
             style={{ backgroundColor: data?.color?.value }}
           />
         </div>
+      </div>
+      <div className="mt-8">
+        <Label htmlFor="quantity" className="mt-8">
+          Số lượng
+        </Label>
+        <Input
+          id="quantity"
+          type="number"
+          value={quantity}
+          onChange={(e) => setQuantity(parseInt(e.target.value, 10))}
+        />
       </div>
       <div className="mt-10 flex items-center gap-x-3">
         <Button onClick={onAddToCart} className="flex items-center gap-x-2">
